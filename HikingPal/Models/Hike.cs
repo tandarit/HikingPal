@@ -1,21 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace HikingPal.Models
 {
-    public class Hike
+    public class Hike : HikeDTO
     {
-        [Key]
-        public Guid HikeID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        [Required]
         public Guid AuthorID { get; set; }
-        public User? Author { get; set; }
-        public string? PhotoUrl { get; set; }
-        public string? PhotoTitle { get; set;}
+        
+        public User? Author { get; set; }        
         [JsonIgnore]
-        public ICollection<HikeUser>? HikeUsers { get; set; }
-       
+        public ICollection<HikeUser>? HikeUsers { get; set; }       
     }
 }

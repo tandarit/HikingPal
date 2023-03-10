@@ -34,11 +34,11 @@ namespace HikingPal.Migrations
                     Salt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Iteration = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoleID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,8 +47,7 @@ namespace HikingPal.Migrations
                         name: "FK_Users_Roles_RoleID",
                         column: x => x.RoleID,
                         principalTable: "Roles",
-                        principalColumn: "RoleID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "RoleID");
                 });
 
             migrationBuilder.CreateTable(
@@ -56,9 +55,9 @@ namespace HikingPal.Migrations
                 columns: table => new
                 {
                     HikeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AuthorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhotoTitle = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -88,14 +87,12 @@ namespace HikingPal.Migrations
                         name: "FK_HikeUsers_Hikes_HikeID",
                         column: x => x.HikeID,
                         principalTable: "Hikes",
-                        principalColumn: "HikeID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "HikeID");
                     table.ForeignKey(
                         name: "FK_HikeUsers_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "UserID");
                 });
 
             migrationBuilder.InsertData(
@@ -103,9 +100,9 @@ namespace HikingPal.Migrations
                 columns: new[] { "RoleID", "RoleDescription", "RoleName" },
                 values: new object[,]
                 {
-                    { new Guid("6adeed17-6576-4d08-b4a4-9a4a123c4373"), "Rules everythings.", "Admin" },
-                    { new Guid("d442cc17-6767-4c94-a963-ee8a40b7a1a5"), "A simple Hiker.", "Hiker" },
-                    { new Guid("f57aae41-9459-4d9f-b22d-bec35b4863db"), "A simple organiser who can organise hiking.", "Organiser" }
+                    { new Guid("036cf081-15b4-49a7-93e1-fd9316796600"), "A simple organiser who can organise hiking.", "Organiser" },
+                    { new Guid("85c92eda-1f5d-40b8-9ea9-9033a064ad04"), "Rules everythings.", "Admin" },
+                    { new Guid("b7d7aac3-c30e-4414-84c5-1275d77e0784"), "A simple Hiker.", "Hiker" }
                 });
 
             migrationBuilder.CreateIndex(

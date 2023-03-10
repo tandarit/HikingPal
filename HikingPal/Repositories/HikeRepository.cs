@@ -19,14 +19,13 @@ namespace HikingPal.Repositories
         public async Task<bool> DeleteHike(Guid hikeID)
         {
             _logger.LogInformation($"Delete hike, ID: {hikeID.ToString()}.");
-            var deletehikeArray = (from hike in _context.Hikes
-                              where hike.HikeID == hikeID
-                              select hike).ToArray<Hike>();
 
-            if (deletehikeArray.Length == 0)
-                return false;
+            var deletehike = _context.Hikes.Where<Hike>(h => h.HikeID == hikeID).SingleOrDefault<Hike>();
+            var deleteHikeUserArray = _context.HikeUsers.Where(hu => hu.HikeID == hikeID).ToList();
 
-            _context.Hikes.RemoveRange(deletehikeArray);
+            _context.Hikes.Remove(deletehike);
+            _context.HikeUsers.RemoveRange(deleteHikeUserArray);
+
             var result = await _context.SaveChangesAsync();
 
             return result>0;
@@ -81,7 +80,7 @@ namespace HikingPal.Repositories
 
         
 
-        public async Task<Hike?> CreateHike(Hike hike)
+        public async Task<HikeDTO?> CreateHike(Hike hike)
         {
             _logger.LogInformation("Repository of creation hike function!");            
 
@@ -97,16 +96,16 @@ namespace HikingPal.Repositories
 
        
 
-        public async Task<List<HikeResponse>> GetAllHikes()
+        public async Task<List<HikeDTO>> GetAllHikes()
         {
             _logger.LogInformation("Repository of query of all hike!");
 
             var getAllHikeList = await (from hike in _context.Hikes
                                   join user in _context.Users on hike.AuthorID equals user.UserID                                                                     
-                                  select new HikeResponse()
+                                  select new HikeDTO()
                                   {
                                       HikeID=hike.HikeID,
-                                      Author= new UserRespond() {
+                                      AuthorDTO= new UserDTO() {
                                           UserID = user.UserID,
                                           FirstName = user.FirstName,
                                           LastName = user.LastName,
@@ -117,31 +116,31 @@ namespace HikingPal.Repositories
                                       Name=hike.Name,
                                       PhotoTitle=hike.PhotoTitle,
                                       PhotoUrl=hike.PhotoUrl,
-                                      Hikers = (from hikeuser in _context.HikeUsers
+                                      HikersDTO = (from hikeuser in _context.HikeUsers
                                                     join userLocal in _context.Users on hikeuser.UserID equals userLocal.UserID
                                                     where hikeuser.HikeID == hike.HikeID
-                                                    select new UserRespond()
+                                                    select new UserDTO()
                                                     {
                                                         UserID = userLocal.UserID,
                                                         Email = userLocal.Email,
                                                         FirstName = userLocal.FirstName,
                                                         LastName = userLocal.LastName,
                                                         Role = userLocal.Role
-                                                    }).ToList<UserRespond>()
-                                  }).ToListAsync<HikeResponse>();
+                                                    }).ToList<UserDTO>()
+                                  }).ToListAsync<HikeDTO>();
               return getAllHikeList;
             
         }
 
-        public async Task<HikeResponse?> GetHike(Guid hikeID)
+        public async Task<HikeDTO?> GetHike(Guid hikeID)
         {
             var getHikeQuery = from hike in _context.Hikes
                                join user in _context.Users on hike.AuthorID equals user.UserID
                                where hike.HikeID == hikeID
-                               select new HikeResponse()
+                               select new HikeDTO()
                                {
                                    HikeID = hike.HikeID,
-                                   Author = new UserRespond()
+                                   AuthorDTO = new UserDTO()
                                    {
                                        UserID = user.UserID,
                                        FirstName = user.FirstName,
@@ -153,20 +152,20 @@ namespace HikingPal.Repositories
                                    Name = hike.Name,
                                    PhotoTitle = hike.PhotoTitle,
                                    PhotoUrl = hike.PhotoUrl,
-                                   Hikers = (from hikeuser in _context.HikeUsers
+                                   HikersDTO = (from hikeuser in _context.HikeUsers
                                              join userLocal in _context.Users on hikeuser.UserID equals userLocal.UserID
                                              where hikeuser.HikeID == hike.HikeID
-                                             select new UserRespond()
+                                             select new UserDTO()
                                              {
                                                  UserID = userLocal.UserID,
                                                  Email = userLocal.Email,
                                                  FirstName = userLocal.FirstName,
                                                  LastName = userLocal.LastName,
                                                  Role = userLocal.Role
-                                             }).ToList<UserRespond>()
+                                             }).ToList<UserDTO>()
                                };
 
-            return await getHikeQuery.FirstOrDefaultAsync<HikeResponse>();
+            return await getHikeQuery.FirstOrDefaultAsync<HikeDTO>();
         }
 
         

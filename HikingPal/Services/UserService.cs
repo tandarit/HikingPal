@@ -1,6 +1,7 @@
 ﻿using HikingPal.Models;
 using HikingPal.Repositories;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace HikingPal.Services
 {
@@ -19,8 +20,9 @@ namespace HikingPal.Services
             _logger = logger;
         }
 
-        public async Task<User?> CreateUser(UserCreateRequest requestedUser)
+        public async Task<UserDTO> CreateUser(UserCreateRequest requestedUser)
         {
+            //dto-bol user csinálni...
             if (requestedUser == null)
             {
                 return null;
@@ -53,16 +55,30 @@ namespace HikingPal.Services
             user.Iteration = iteration;
             user.Role = hikerRole;        //the basic role is Hiker
 
-            var createResult = await _userRepository.CreateUser(user);
+            var isCreated = await _userRepository.CreateUser(user);
 
-            if(createResult)
-            {
+            if(isCreated)
+            {                
                 return user;
             }
             return null;
         }
 
-        public async Task<List<User>> ListAllUser()
+        public async Task<bool> DeleteUser(string userID, Claim[] myClaim)
+        {
+            Guid userGuid = new Guid(userID);
+
+            //check user roles
+            //delete if yourself or admin
+            if (myClaim[1].Value.Equals("Admin") || myClaim[2].Value.Equals(userID))
+            {
+                return await _userRepository.DeleteUser(userGuid);
+            }
+
+            return false;
+        }
+
+        public async Task<List<UserDTO>> ListAllUser()
         {
             return await _userRepository.GetAllUser();
         }

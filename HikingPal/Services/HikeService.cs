@@ -22,13 +22,24 @@ namespace HikingPal.Services
         }
 
 
-        public async Task<Hike?> CreateHike(Hike newHike, string userGuid)
+        public async Task<HikeDTO?> CreateHike(HikeDTO newHikeDTO, string userGuid)
         {
             _logger.LogInformation($"Hike created by user.");
 
             //some check need here....
-            newHike.AuthorID = Guid.Parse(userGuid);
-            Hike createdHike = await _hikeRepository.CreateHike(newHike);
+            
+            Hike newHike = new Hike()
+            {
+                AuthorID = Guid.Parse(userGuid),
+                Description = newHikeDTO.Description,
+                Name= newHikeDTO.Name,
+                PhotoTitle= newHikeDTO.PhotoTitle,
+                PhotoUrl= newHikeDTO.PhotoUrl
+                
+
+            };
+
+            var createdHike = await _hikeRepository.CreateHike(newHike);
             if(createdHike!=null)
             {
                 HikeUser ownerHiker = new HikeUser()
@@ -44,7 +55,7 @@ namespace HikingPal.Services
             return null;
         }
 
-        public async Task<HikeResponse?> GetHike(string hikeID)
+        public async Task<HikeDTO?> GetHike(string hikeID)
         {
             Guid hikeGuid = new Guid(hikeID);
 
@@ -52,7 +63,7 @@ namespace HikingPal.Services
             
         }
 
-        public async Task<List<HikeResponse>> GetHikes()
+        public async Task<List<HikeDTO>> GetHikes()
         {
             var allHikes = await _hikeRepository.GetAllHikes();
             

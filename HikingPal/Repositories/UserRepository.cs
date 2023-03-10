@@ -26,7 +26,29 @@ namespace HikingPal.Repositories
             return effectedRows > 0;
         }
 
-        public async Task<List<User>> GetAllUser()
+        public async Task<bool> DeleteUser(Guid userID)
+        {
+            _logger.LogInformation($"Delete user: {userID.ToString()}!");
+
+            var deleteUser = await _context.Users.Where(u => u.UserID == userID).FirstAsync<User>();
+
+            //remove from user table
+            _context.Users.Remove(deleteUser);
+
+            //remove from HikeUser table
+            var deleteHikeUserArray = _context.HikeUsers.Where(hu => hu.UserID == userID).ToArray<HikeUser>();
+            _context.HikeUsers.RemoveRange(deleteHikeUserArray);
+
+            //remove from hike table
+            var deleteHikeArray = _context.Hikes.Where(h => h.Author == deleteUser).ToArray<Hike>();
+            _context.Hikes.RemoveRange(deleteHikeArray);
+
+            var effectedRows = await _context.SaveChangesAsync();
+
+            return effectedRows > 0;
+        }
+
+        public async Task<List<UserDTO>> GetAllUser()
         {
             _logger.LogInformation("Repository of all user list function!");
             var userList = from user in _context.Users 
@@ -49,7 +71,7 @@ namespace HikingPal.Repositories
                                }
                            };
             //var userList = await _context.Users.Where<User>(r=>r.Role.RoleID==) .ToListAsync<User>();
-            return await userList.ToListAsync<User>();
+            return await userList.ToListAsync<UserDTO>();
         }
 
         public async Task<User> GetUser(string userName)

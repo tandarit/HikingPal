@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HikingPal.Migrations
 {
     [DbContext(typeof(HikingPalDataContext))]
-    [Migration("20230108145227_Initial")]
+    [Migration("20230131191321_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace HikingPal.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -97,19 +97,19 @@ namespace HikingPal.Migrations
                     b.HasData(
                         new
                         {
-                            RoleID = new Guid("6adeed17-6576-4d08-b4a4-9a4a123c4373"),
+                            RoleID = new Guid("85c92eda-1f5d-40b8-9ea9-9033a064ad04"),
                             RoleDescription = "Rules everythings.",
                             RoleName = "Admin"
                         },
                         new
                         {
-                            RoleID = new Guid("d442cc17-6767-4c94-a963-ee8a40b7a1a5"),
+                            RoleID = new Guid("b7d7aac3-c30e-4414-84c5-1275d77e0784"),
                             RoleDescription = "A simple Hiker.",
                             RoleName = "Hiker"
                         },
                         new
                         {
-                            RoleID = new Guid("f57aae41-9459-4d9f-b22d-bec35b4863db"),
+                            RoleID = new Guid("036cf081-15b4-49a7-93e1-fd9316796600"),
                             RoleDescription = "A simple organiser who can organise hiking.",
                             RoleName = "Organiser"
                         });
@@ -117,7 +117,7 @@ namespace HikingPal.Migrations
 
             modelBuilder.Entity("HikingPal.Models.User", b =>
                 {
-                    b.Property<Guid>("UserID")
+                    b.Property<Guid?>("UserID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -140,7 +140,7 @@ namespace HikingPal.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoleID")
+                    b.Property<Guid?>("RoleID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Salt")
@@ -174,13 +174,13 @@ namespace HikingPal.Migrations
                     b.HasOne("HikingPal.Models.Hike", "Hike")
                         .WithMany("HikeUsers")
                         .HasForeignKey("HikeID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.HasOne("HikingPal.Models.User", "User")
                         .WithMany("HikeUsers")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.Navigation("Hike");
@@ -193,8 +193,7 @@ namespace HikingPal.Migrations
                     b.HasOne("HikingPal.Models.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Role");
                 });

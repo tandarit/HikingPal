@@ -23,11 +23,11 @@ namespace HikingPal.DataContext
         {
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
-                .WithMany(r => r.Users).HasForeignKey("RoleID").OnDelete(DeleteBehavior.ClientCascade);
+                .WithMany(r => r.Users).HasForeignKey("RoleID").OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Hike>()
                 .HasOne(h => h.Author)
-                .WithMany(u => u.HikeAutors).HasForeignKey("AuthorID");
+                .WithMany(u => u.HikeAutors).HasForeignKey("AuthorID").OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HikeUser>()
                 .HasKey(hu => hu.HikeUserID);
@@ -35,12 +35,12 @@ namespace HikingPal.DataContext
             modelBuilder.Entity<HikeUser>()
                 .HasOne(hu => hu.Hike)
                 .WithMany(h => h.HikeUsers)
-                .HasForeignKey(hu => hu.HikeID).OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(hu => hu.HikeID).OnDelete(DeleteBehavior.ClientNoAction);
 
             modelBuilder.Entity<HikeUser>()
                 .HasOne(hu => hu.User)
                 .WithMany(u => u.HikeUsers)
-                .HasForeignKey(hu => hu.UserID).OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(hu => hu.UserID).OnDelete(DeleteBehavior.ClientNoAction);
 
 
             modelBuilder.Entity<Role>().HasData(new Role()
